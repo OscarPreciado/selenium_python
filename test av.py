@@ -1,23 +1,63 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
 
 URL = 'https://nuxqa5.avtest.ink/es/'
 
 options = webdriver.ChromeOptions()
+
+#Modo headless
+options.add_argument("--headless=new")
+options.add_argument("--disable-gpu")
+options.add_argument("--window-size=1920,1080")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+
+# 👉 Camuflaje anti-detección
+options.add_argument("--disable-blink-features=AutomationControlled")
+options.add_argument(
+    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/120.0.0.0 Safari/537.36"
+)
+
+# Termina modo headless
+
 driver = webdriver.Chrome(options=options)
-driver.maximize_window()
+#driver.maximize_window()
 
 driver.get(URL)
-# btn_aliados = driver.find_element(By.ID, 'nonAvFly')
-# btn_aliados.click()
+
+############
+# Eliminar navigator.webdriver (truco anti-bot detection, gracias chatgpt)
+driver.execute_cdp_cmd(
+    "Page.addScriptToEvaluateOnNewDocument",
+    {
+        "source": """
+        Object.defineProperty(navigator, 'webdriver', {
+          get: () => undefined
+        })
+        """
+    },
+)
+############
 
 # time.sleep(2)
 
 
 # BUSQUEDA EN LA HOME
 
-select_origin = driver.find_element(By.ID, 'originStationSelected')
+try:
+    select_origin = WebDriverWait(driver, 40).until(
+        EC.presence_of_element_located((By.ID, "originStationSelected"))
+    )
+    print("Elemento encontrado:", select_origin.text)
+except:
+    print("❌ No se encontró el elemento")
+    # Ver los primeros caracteres del DOM para revisar
+    print(driver.page_source[:1000])
 print(select_origin.text)
 
 time.sleep(1)
@@ -327,4 +367,5 @@ time.sleep(3)
 btn_pay_xpath = '/html/body/dcx-content-body/div/div/div[3]/div/div[1]/div/div[2]/dcx-component/div/div[2]/div/action-button/ds-button/button'
 btn_pay = driver.find_element(By.XPATH, btn_pay_xpath).click()
 
-time.sleep(60)#gg
+time.sleep(60)
+print("Aqui ya estoy en itinerary")
