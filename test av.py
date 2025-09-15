@@ -327,4 +327,4 @@ time.sleep(3)
 btn_pay_xpath = '/html/body/dcx-content-body/div/div/div[3]/div/div[1]/div/div[2]/dcx-component/div/div[2]/div/action-button/ds-button/button'
 btn_pay = driver.find_element(By.XPATH, btn_pay_xpath).click()
 
-time.sleep(60)
+time.sleep(60)#gg
